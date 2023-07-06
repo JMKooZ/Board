@@ -17,6 +17,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 public class PostController {
 
     private final PostService postService;
+    @GetMapping("/")
+    public String index(){
+        return "redirect:/post/list.do";
+    }
 
     @GetMapping("/post/write.do")
     public String writePost(@RequestParam(value = "bno", required = false) final Long bno, Model model) {
