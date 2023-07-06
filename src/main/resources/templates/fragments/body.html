@@ -7,27 +7,6 @@
     <div class="head">
       <h1>게시판 프로젝트</h1>
       <div class="top_menu">
-<<<<<<< Updated upstream
-        <div class="login_user" th:if="${!session.isEmpty()}" th:text="|${session.user.name}님 반갑습니다.|"><strong><i class="far fa-user-circle"></i></strong></div>
-        <div class="login_user" th:unless="${!session.isEmpty()}" th:text="로그인"><strong><i class="far fa-user-circle"></i></strong></div>
-        <div class="logout">
-          <button type="button"><span class="skip_info">로그아웃</span><i
-              class="fas fa-sign-out-alt"></i></button>
-        </div>
-      </div>
-      <ul>
-        <li onclick="kakaoLogin();">
-          <a href="javascript:void(0)">
-            <span>카카오 로그인</span>
-          </a>
-        </li>
-        <li onclick="Logout();">
-          <a href="javascript:void(0)">
-            <span>카카오 로그아웃</span>
-          </a>
-        </li>
-      </ul>
-=======
         <div class="login_user" th:if="${!session.isEmpty()}" th:text="|${session.user.email}님 반갑습니다.|"><strong><i class="far fa-user-circle"></i></strong></div>
         <div class="login_user" th:unless="${!session.isEmpty()}"><a  th:text="로그인" th:href="@{/user/signUp}" methods="get"></a> </div>
 
@@ -36,7 +15,6 @@
               class="fas fa-sign-out-alt"></i></button>
         </div>
       </div>
->>>>>>> Stashed changes
     </div>
   </header>
 
@@ -90,22 +68,6 @@
   // sdk 초기화 여부 판단
   console.log(Kakao.isInitialized())
 
-  // 카카오 로그인
-  function kakaoLogin() {
-    Kakao.Auth.login({
-      success: function (response) {
-        Kakao.API.request({
-          url: `/post/list.do`,
-          success: function (response) {
-            console.log(response);
-          },
-          error: function (error) {
-            console.log(error);
-          }
-        })
-      }
-    })
-
     function Logout() {
       if (Kakao.Auth.getAccessToken()) {
         Kakao.API.request({
@@ -120,29 +82,10 @@
         Kakao.Auth.setAccessToken(undefined)
       }
     }
-  }
+
 </script>
 <!-- 자바스크립트 시작 -->
 <th:block layout:fragment="script"></th:block>
-=======
-<!-- 자바스크립트 시작 -->
-<th:block layout:fragment="script">
-  <script>
-    function userLogout(){
-      $.ajax({
-        url:`/user/logout`,
-        type:'get',
-        success:function (){
-          location.reload()
-        },
-        error:function (){
-          alert('에러')
-        }
-      })
-    }
-  </script>
-</th:block>
->>>>>>> Stashed changes
 <!-- 자바스크립트 끝 -->
 </body>
 </html>
