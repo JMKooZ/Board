@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="layout/basic">
+<th:block layout:fragment="title">
+  <title>회원가입 페이지</title>
+</th:block>
+<th:block layout:fragment="content">
+  <form th:action="@{/user/signUp}" method="post" id="saveUser">
+    <div class="mb-3">
+      <label for="email" class="form-label">사용자 ID</label>
+      <input type="text" id="email" name="email" class="form-control">
+    </div>
+    <div class="mb-3">
+      <label for="passWord" class="form-label">사용자 비밀번호</label>
+      <input type="password" id="passWord" name="passWord" class="form-control">
+    </div>
+    <!--        <input type="hidden" th:text="${qno}" id="qno" name="qno">-->
+    <button type="button" onclick="saveUser()" class="btn btn-primary">회원가입 완료</button>
+
+  </form>
+  <div class="container my-3">
+  <ul>
+    <li onclick="kakaoLogin();">
+      <a href="javascript:void(0)">
+        <span>카카오 로그인</span>
+      </a>
+    </li>
+    <li onclick="Logout();">
+      <a href="javascript:void(0)">
+        <span>카카오 로그아웃</span>
+      </a>
+    </li>
+  </ul>
+  </div>
+</th:block>
+<th:block layout:fragment="script">
+  <script th:inline="javascript">
+    function saveUser(){
+      const form = document.getElementById('saveUser');
+      const fields = [form.email, form.passWord]
+      const field = ['email', '비밀번호']
+      for( let i = 0, len = fields.length; i<len ; i++){
+        isValid(fields[i], field[i])
+      }
+      form.submit();
+    }
+
+    // 발급 받은 키 중 javascript 키를 사용해준다
+    Kakao.init('9443cece0e9fcadb8c6f70e1a5b97c12');
+    // sdk 초기화 여부 판단
+    console.log(Kakao.isInitialized())
+
+    // 카카오 로그인
+    function kakaoLogin() {
+      Kakao.Auth.login({
+        success: function (response) {
+          Kakao.API.request({
+            url: `/post/list.do`,
+            success: function (response) {
+              console.log(response);
+            },
+            error: function (error) {
+              console.log(error);
+            }
+          })
+        }
+      })
+
+      function Logout() {
+        if (Kakao.Auth.getAccessToken()) {
+          Kakao.API.request({
+            url: `/post/write.do`,
+            success: function (response) {
+              console.log(response)
+            },
+            fail: function (error) {
+              console.log(error)
+            },
+          })
+          Kakao.Auth.setAccessToken(undefined)
+        }
+      }
+    }
+  </script>
+</th:block>
+</html>

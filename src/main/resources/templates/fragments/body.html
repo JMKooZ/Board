@@ -7,6 +7,7 @@
     <div class="head">
       <h1>게시판 프로젝트</h1>
       <div class="top_menu">
+<<<<<<< Updated upstream
         <div class="login_user" th:if="${!session.isEmpty()}" th:text="|${session.user.name}님 반갑습니다.|"><strong><i class="far fa-user-circle"></i></strong></div>
         <div class="login_user" th:unless="${!session.isEmpty()}" th:text="로그인"><strong><i class="far fa-user-circle"></i></strong></div>
         <div class="logout">
@@ -26,6 +27,16 @@
           </a>
         </li>
       </ul>
+=======
+        <div class="login_user" th:if="${!session.isEmpty()}" th:text="|${session.user.email}님 반갑습니다.|"><strong><i class="far fa-user-circle"></i></strong></div>
+        <div class="login_user" th:unless="${!session.isEmpty()}"><a  th:text="로그인" th:href="@{/user/signUp}" methods="get"></a> </div>
+
+        <div class="logout">
+          <button type="button" onclick="userLogout()"><span class="skip_info">로그아웃</span><i
+              class="fas fa-sign-out-alt"></i></button>
+        </div>
+      </div>
+>>>>>>> Stashed changes
     </div>
   </header>
 
@@ -71,6 +82,7 @@
 <script th:src="@{/js/summernote-ko-KR.js}"></script>
 <!-- Bootstrap JS -->
 <script th:src="@{/js/bootstrap.min.js}"></script>
+<<<<<<< Updated upstream
 
 <script th:inline="javascript">
   // 발급 받은 키 중 javascript 키를 사용해준다
@@ -112,6 +124,25 @@
 </script>
 <!-- 자바스크립트 시작 -->
 <th:block layout:fragment="script"></th:block>
+=======
+<!-- 자바스크립트 시작 -->
+<th:block layout:fragment="script">
+  <script>
+    function userLogout(){
+      $.ajax({
+        url:`/user/logout`,
+        type:'get',
+        success:function (){
+          location.reload()
+        },
+        error:function (){
+          alert('에러')
+        }
+      })
+    }
+  </script>
+</th:block>
+>>>>>>> Stashed changes
 <!-- 자바스크립트 끝 -->
 </body>
 </html>

@@ -3,6 +3,10 @@
   "http://mybatis.org/dtd/mybatis-3-config.dtd">
 <configuration>
   <mappers>
+<<<<<<< Updated upstream
+=======
+    <mapper resource="UserMapper.xml"/>
+>>>>>>> Stashed changes
     <mapper resource="PostMapper.xml"/>
   </mappers>
 </configuration>
