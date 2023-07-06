@@ -1,5 +1,6 @@
 package com.study.board.controller.post;
 
+import com.study.board.domain.message.MessageDto;
 import com.study.board.domain.post.PostRequest;
 import com.study.board.domain.post.PostResponse;
 import com.study.board.service.post.PostService;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -32,14 +34,19 @@ public class PostController {
     }
 
     @PostMapping("/post/save.do")
-    public String savePost(final PostRequest params){
+    public String savePost(final PostRequest params, Model model){
         postService.savePost(params);
-        return "redirect:/post/list.do";
+        MessageDto message = new MessageDto("게시글 생성이 완료되었습니다.", "/post/list.do", RequestMethod.GET,null);
+        model.addAttribute("message", message);
+        return showMessageAndRedirect(message, model);
     }
     @PostMapping("/post/update.do")
-    public String updatePost(final PostRequest params){
+    public String updatePost(final PostRequest params, Model model){
         postService.update(params);
-        return "redirect:/post/view.do?bno="+params.getBno();
+        String uri = "/post/view.do?bno="+params.getBno();
+        MessageDto message = new MessageDto("게시글 수정이 완료되었습니다.", uri, RequestMethod.GET,null);
+        model.addAttribute("message", message);
+        return showMessageAndRedirect(message, model);
     }
 
     @GetMapping("/post/list.do")
@@ -65,5 +72,10 @@ public class PostController {
     public String deletePost(@RequestParam(value = "bno")final Long bno){
         postService.deleteByBno(bno);
         return "success";
+    }
+    // 사용자에게 메시지를 전달하고, 페이지를 리다이렉트 한다.
+    private String showMessageAndRedirect(final MessageDto message, Model model) {
+        model.addAttribute("message", message);
+        return "message/messageRedirect";
     }
 }

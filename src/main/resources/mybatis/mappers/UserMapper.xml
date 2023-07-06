@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.study.board.domain.user.UserMapper">
+  <insert id="saveUser" parameterType="UserResponse" useGeneratedKeys="true" keyProperty="uno">
+    INSERT INTO board.user (uno, name, email, passWord, nickName, gender, phoneNumber, birth, createdDate, modifiedDate)
+    VALUES ( #{uno}
+           , #{name}
+           , #{email}
+           , #{passWord}
+           , #{nickName}
+           , #{gender}
+           , #{phoneNumber}
+           , #{birth}
+           , NOW()
+           , NULL)
+  </insert>
+
+  <select id="findByUno" parameterType="Long" resultType="UserResponse">
+    select *
+    from board.user
+    where
+      # 왜 밸류라고 표시하는지
+      uno = #{uno}
+  </select>
+
+  <update id="update" parameterType="PostRequest">
+    update board.post
+    set modifiedDate = NOW()
+      , title         = #{title}
+      , content       = #{content}
+      , writer        = #{writer}
+      , noticeYn     = #{noticeYn}
+    WHERE bno = #{bno}
+  </update>
+
+  <delete id="deleteByBno" parameterType="Long">
+    UPDATE board.post
+    SET deleteYn = 1
+    WHERE bno = #{bno}
+  </delete>
+
+  <select id="findAll" resultType="PostResponse">
+    SELECT *
+    FROM board.post
+    WHERE deleteYn = 0
+    ORDER BY bno DESC
+  </select>
+</mapper>
