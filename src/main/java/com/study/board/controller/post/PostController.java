@@ -1,6 +1,6 @@
 package com.study.board.controller.post;
 
-import com.study.board.domain.message.MessageDto;
+import com.study.board.domain.common.MessageDto;
 import com.study.board.domain.post.PostRequest;
 import com.study.board.domain.post.PostResponse;
 import com.study.board.service.post.PostService;
@@ -76,6 +76,6 @@ public class PostController {
     // 사용자에게 메시지를 전달하고, 페이지를 리다이렉트 한다.
     private String showMessageAndRedirect(final MessageDto message, Model model) {
         model.addAttribute("message", message);
-        return "message/messageRedirect";
+        return "common/messageRedirect";
     }
 }

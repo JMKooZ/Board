@@ -1,4 +1,4 @@
-package com.study.board.domain.message;
+package com.study.board.domain.common;
 
 import java.util.Map;
 import lombok.AllArgsConstructor;
