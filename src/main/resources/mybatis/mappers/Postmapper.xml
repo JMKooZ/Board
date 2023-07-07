@@ -4,7 +4,8 @@
 
 <mapper namespace="com.study.board.domain.post.PostMapper">
   <insert id="savePost" parameterType="PostRequest" useGeneratedKeys="true" keyProperty="bno">
-    INSERT INTO board.post (bno, title, content, writer, viewCnt, noticeYn, deleteYn, createdDate, modifiedDate)
+    INSERT INTO board.post (bno, title, content, writer, viewCnt, noticeYn, deleteYn, createdDate,
+                            modifiedDate)
     VALUES ( #{bno}
            , #{title}
            , #{content}
@@ -19,16 +20,15 @@
   <select id="findByBno" parameterType="Long" resultType="PostResponse">
     select *
     from board.post
-    where
-      bno = #{value}
+    where bno = #{value}
   </select>
 
   <update id="update" parameterType="PostRequest">
     update board.post
     set modifiedDate = NOW()
-      , title         = #{title}
-      , content       = #{content}
-      , writer        = #{writer}
+      , title        = #{title}
+      , content      = #{content}
+      , writer       = #{writer}
       , noticeYn     = #{noticeYn}
     WHERE bno = #{bno}
   </update>
@@ -39,10 +39,17 @@
     WHERE bno = #{bno}
   </delete>
 
-  <select id="findAll" resultType="PostResponse">
+  <select id="findAll" parameterType="SearchDto" resultType="PostResponse">
     SELECT *
     FROM board.post
     WHERE deleteYn = 0
     ORDER BY bno DESC
+    LIMIT #{pagination.limitStart}, #{recordSize}
+  </select>
+
+  <select id="count" parameterType="SearchDto" resultType="int">
+    SELECT COUNT(*)
+    FROM board.post
+    WHERE deleteYn = 0
   </select>
 </mapper>
