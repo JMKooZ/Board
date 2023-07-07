@@ -12,26 +12,6 @@ mybatis:
 #  mapper.xml의 위치를 매핑시켜주는것
   mapper-locations: classpath:mybatis/mappers/**/*.xml
 
-# log4jdbc, mybatis console log
+# log4jdbc, mybatis console log - logback-spring.xml 구성요소 추가
 logging:
-  level:
-    com:
-      zaxxer:
-        hikari: INFO
-    javax:
-      sql:
-        DataSource: OFF
-    jdbc:
-      audit: OFF
-      resultset: OFF
-      resultsettable: INFO  #SQL 결과 데이터 Table을 로그로 남긴다.
-      sqlonly: INFO     #SQL만 로그로 남긴다.
-      sqltiming: INFO    #SQL과 소요시간을 표기한다.
-      connection : OFF  # 커넥션 확인가능 (커넥션 누수를 해결하는데 도움이 된다.)
-    org:
-      hibernate:
-        SQL: DEBUG
-        type:
-          descriptor:
-            sql:
-              BasicBinder: TRACE    # 로그 레벨 : TRACE -> DEBUG -> INFO -> WARN -> ERROR -> FATAL 순서
+  config: classpath:logback-spring.xml
