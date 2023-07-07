@@ -1,6 +1,8 @@
 package com.study.board.controller.post;
 
 import com.study.board.domain.common.MessageDto;
+import com.study.board.domain.common.SearchDto;
+import com.study.board.domain.common.paging.PagingResponse;
 import com.study.board.domain.post.PostRequest;
 import com.study.board.domain.post.PostResponse;
 import com.study.board.service.post.PostService;
@@ -9,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -50,9 +53,11 @@ public class PostController {
     }
 
     @GetMapping("/post/list.do")
-    public String listPost(Model model){
-        List<PostResponse> posts = postService.findAll();
-        model.addAttribute("posts",posts);
+    public String listPost(@ModelAttribute("params") final SearchDto params, Model model){
+        // 1 대 1 로 매핑 되는 단일 파라미터는 @RequestParam 으로 전달 받은후 model에 추가하여 직접 뷰에 전달해야된다.
+        // @ModelAttribute 을 이용하면 파라미터로 수집한 객체를 자동으로 뷰까지 전달이 가능하다.
+        PagingResponse<PostResponse> response = postService.findAll(params);
+        model.addAttribute("response",response);
         return "post/list";
     }
 
