@@ -20,7 +20,6 @@
     select *
     from board.post
     where
-      # 왜 밸류라고 표시하는지
       bno = #{value}
   </select>
 

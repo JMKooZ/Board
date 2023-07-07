@@ -60,9 +60,21 @@
 <script th:src="@{/js/summernote-ko-KR.js}"></script>
 <!-- Bootstrap JS -->
 <script th:src="@{/js/bootstrap.min.js}"></script>
-<<<<<<< Updated upstream
 
 <script th:inline="javascript">
+  function userLogout(){
+    $.ajax({
+      url: `/user/logout`,
+      type: 'post',
+      success:function (){
+        alert('로그아웃완료')
+        location.reload()
+      },
+      error:function (){
+        alert('에러')
+      }
+    })
+  }
   // 발급 받은 키 중 javascript 키를 사용해준다
   Kakao.init('9443cece0e9fcadb8c6f70e1a5b97c12');
   // sdk 초기화 여부 판단

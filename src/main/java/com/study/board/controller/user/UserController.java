@@ -28,7 +28,7 @@ public class UserController {
         return "redirect:/post/list.do";
     }
 
-    @GetMapping("/user/logout")
+    @PostMapping("/user/logout")
     @ResponseBody
     public String logoutUser(HttpSession session){
         session.removeAttribute("user");
