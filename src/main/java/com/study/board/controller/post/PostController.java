@@ -6,8 +6,12 @@ import com.study.board.domain.common.paging.PagingResponse;
 import com.study.board.domain.post.PostRequest;
 import com.study.board.domain.post.PostResponse;
 import com.study.board.service.post.PostService;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,6 +23,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 @RequiredArgsConstructor
+@Slf4j
 public class PostController {
 
     private final PostService postService;
@@ -73,14 +78,26 @@ public class PostController {
     }
 
     @PostMapping("/post/delete.do")
-    @ResponseBody
-    public String deletePost(@RequestParam(value = "bno")final Long bno){
+//    @ResponseBody
+    public String deletePost(@RequestParam(value = "bno")final Long bno, final SearchDto queryParams,
+        Model model){
         postService.deleteByBno(bno);
-        return "success";
+        MessageDto message = new MessageDto("게시글 삭제가 완료되었습니다.", "/post/list.do",
+            RequestMethod.GET, queryParamsToMap(queryParams));
+        return showMessageAndRedirect(message,model);
     }
     // 사용자에게 메시지를 전달하고, 페이지를 리다이렉트 한다.
     private String showMessageAndRedirect(final MessageDto message, Model model) {
         model.addAttribute("message", message);
         return "common/messageRedirect";
+    }
+    private Map<String, Object> queryParamsToMap(final SearchDto queryParams){
+        Map<String, Object> data = new HashMap<>();
+        data.put("page", queryParams.getPage());
+        data.put("recordSize", queryParams.getRecordSize());
+        data.put("pageSize", queryParams.getPageSize());
+        data.put("keyword", queryParams.getKeyword());
+        data.put("searchType", queryParams.getSearchType());
+        return data;
     }
 }
