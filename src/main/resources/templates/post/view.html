@@ -46,21 +46,73 @@
         </tr>
         </tbody>
       </table>
+
+      <!--/* 댓글 작성 */-->
+      <div class="cm_write">
+        <fieldset>
+          <legend class="skipinfo">댓글 입력</legend>
+          <div class="cm_input">
+            <p><textarea id="content" name="content" onkeyup="countingLength(this);" cols="90"
+                         rows="4" placeholder="댓글을 입력해 주세요."></textarea></p>
+            <span><button type="button" class="btns" onclick="saveComment();">등 록</button> <i
+                id="counter">0/300자</i></span>
+          </div>
+        </fieldset>
+      </div>
+
       <p class="btn_set">
-        <a th:href="@{/post/view.do(bno=${post.bno}-1)}" class="btns btn_bdr4 btn_mid">전글</a>
-        <a th:href="@{/post/view.do(bno=${post.bno}+1)}" class="btns btn_bdr3 btn_mid">다음글</a>
+        <button type="button" onclick="goUpdatePage();" class="btns btn_bdr4 btn_mid">수정</button>
+        <button type="button" onclick="deletePost();" class="btns btn_bdr1 btn_mid">삭제</button>
+        <button type="button" onclick="goListPage();" class="btns btn_bdr3 btn_mid">뒤로</button>
       </p>
-        <p class="btn_set">
-          <button type="button" onclick="goUpdatePage();" class="btns btn_bdr4 btn_mid">수정</button>
-          <button type="button" onclick="deletePost();" class="btns btn_bdr1 btn_mid">삭제</button>
-          <button type="button" onclick="goListPage();" class="btns btn_bdr3 btn_mid">뒤로</button>
-        </p>
     </section>
+    <!--/* 댓글 렌더링 영역 */-->
+    <div class="cm_list">
+
+    </div>
   </div> <!--/* .content */-->
+
+  <!--/* 댓글 수정 popup */-->
+  <div id="commentUpdatePopup" class="popLayer">
+    <h3>댓글 수정</h3>
+    <div class="pop_container">
+      <table class="tb tb_row tl">
+        <colgroup>
+          <col style="width:30%;"/>
+          <col style="width:70%;"/>
+        </colgroup>
+        <tbody>
+        <tr>
+          <th scope="row">작성자<span class="es">필수 입력</span></th>
+          <td><input type="text" id="modalWriter" name="modalWriter" placeholder="작성자를 입력해 주세요."/>
+          </td>
+        </tr>
+        <tr>
+          <th scope="row">내용<span class="es">필수 입력</span></th>
+          <td><textarea id="modalContent" name="modalContent" cols="90" rows="10"
+                        placeholder="수정할 내용을 입력해 주세요."></textarea></td>
+        </tr>
+        </tbody>
+      </table>
+      <p class="btn_set">
+        <button type="button" id="commentUpdateBtn" class="btns btn_st2">수정</button>
+        <button type="button" class="btns btn_bdr2" onclick="closeCommentUpdatePopup();">취소</button>
+      </p>
+    </div>
+    <button type="button" class="btn_close" onclick="closeCommentUpdatePopup();"><span><i
+        class="far fa-times-circle"></i></span></button>
+  </div>
+
+
 </th:block>
 <th:block layout:fragment="script">
   <script th:inline="javascript">
     /*<![CDATA[*/
+    window.onload = () => {
+      // 최초 메서드 실행으로 댓글 리스트 가져옴
+      findAllComment();
+    }
+
     // 게시글 수정 페이지 이동
     function goUpdatePage() {
       location.href = '/post/write.do' + location.search;
@@ -95,21 +147,181 @@
 
       document.body.append(form);
       document.getElementById('deleteForm').submit();
-      // $.ajax({
-      //   url: `/post/delete.do`,
-      //   type: 'post',
-      //   data: {
-      //     'bno': bno
-      //   },
-      //   success: function () {
-      //     alert('게시글 삭제가 완료되었습니다.')
-      //     document.getElementById('deleteForm').submit();
-      //   },
-      //   error: function () {
-      //     alert('에러')
-      //   }
-      // })
     }
+
+    // 댓글 길이 카운팅
+    function countingLength(content) {
+      if (content.value.length > 300) {
+        alert('댓글을 300자 이하로 입력해 주세요.');
+        content.value = content.value.substring(0, 300);
+        content.focus();
+      }
+      document.getElementById('counter').innerText = content.value.length + '/300자';
+    }
+
+    // 댓글 저장
+    function saveComment() {
+      const bno = [[${post.bno}]];
+      const content = document.getElementById('content');
+      isValid(content, '댓글');
+      const params = {
+        bno: bno,
+        content: content.value,
+        writer: '홍길동'
+      }
+      $.ajax({
+        url: `/posts/${bno}/comments`,
+        type: 'post',
+        contentType: 'application/json; charset=utf-8',
+        dataType: 'json',
+        data: JSON.stringify(params),
+        async: false,
+        success: function (response) {
+          console.log(response);
+          alert('댓글이 등록되었습니다.');
+          content.value = '';
+          document.getElementById('counter').innerHTML = '0/300자';
+          findAllComment();
+        },
+        error: function (request, status, error) {
+          console.log(error)
+        }
+      })
+    }
+
+    // 게시물 들어갈 때 댓글 리스트 가져오기
+    function findAllComment() {
+      const bno = [[ ${post.bno}]];
+
+      $.ajax({
+        url: `/posts/${bno}/comments`,
+        type: 'get',
+        dataType: 'json',
+        async: false,
+        success: function (response) {
+          console.log(response)
+
+          // 댓글 데이터가 없는 경우
+          if (!response.length) {
+            document.querySelector('.cm_list').innerHTML =
+                `<div class="cm_none"><p>등록된 댓글이 없습니다.</p></div>`;
+          }
+
+          let commentHtml = '';
+
+          // 댓글 HTML 추가
+          response.forEach(comment => {
+            commentHtml += `
+                        <div>
+                            <span class="writer_img"><img src="/images/default_profile.png" width="30" height="30" alt="기본 프로필 이미지"/></span>
+                            <p class="writer">
+                                <em>${comment.writer}</em>
+                                <span class="date">${dayjs(comment.createdDate).format(
+                'YYYY-MM-DD HH:mm')}</span>
+                            </p>
+                            <div class="cont"><div class="txt_con">${comment.content}</div></div>
+                            <p class="func_btns">
+        <button type="button" onclick="openCommentUpdatePopup(${comment.cno});" class="btns"><span class="icons icon_modify">수정</span></button>
+        <button type="button" onclick="deleteComment(${comment.cno})" class="btns"><span class="icons icon_del">삭제</span></button>
+    </p>
+                        </div>
+                    `;
+          })
+          document.querySelector('.cm_list').innerHTML = commentHtml;
+        },
+        error: function (request, status, error) {
+          console.log(error)
+        }
+      })
+    }
+
+    // 댓글 삭제 함수
+    function deleteComment(cno) {
+      if (!confirm('삭제하시겠습니까?')) {
+        return false;
+      }
+
+      const bno = [[${post.bno}]];
+
+      $.ajax({
+        url: `/posts/${bno}/comments/${cno}`,
+        type: 'delete',
+        dataType: 'json',
+        async: false,
+        success: function (response) {
+          alert('삭제 완료');
+          findAllComment();
+        },
+        error: function (error) {
+          console.log(error)
+        }
+      })
+    }
+
+    // 댓글 수정 모달 오픈
+    function openCommentUpdatePopup(cno) {
+
+      const bno = [[ ${post.bno}]];
+
+      $.ajax({
+        url: `/posts/${bno}/comments/${cno}`,
+        type: 'get',
+        dataType: 'json',
+        async: false,
+        success: function (response) {
+          document.getElementById('modalWriter').value = response.writer;
+          document.getElementById('modalContent').value = response.content;
+          // 댓글 수정 버튼의 속성을 온클릭으로 바꾼다.
+          document.getElementById('commentUpdateBtn').setAttribute('onclick',
+              `updateComment(${cno})`);
+          layerPop('commentUpdatePopup');
+        },
+        error: function (request, status, error) {
+          console.log(error)
+        }
+      })
+    }
+
+    // 댓글 수정 함수
+    function updateComment(cno) {
+      let writer = document.getElementById('modalWriter').value;
+      let content = document.getElementById('modalContent').value;
+      // isValid(writer, '작성자');
+      // isValid(content, '수정할 내용');
+
+      const bno = [[${post.bno}]]
+      const param = {
+        'cno': cno,
+        'bno': bno,
+        'writer': writer,
+        'content': content
+      };
+
+      $.ajax({
+        url: `/posts/${bno}/comments/${cno}`,
+        type: 'patch',
+        dataType: 'json',
+        contentType: 'application/json; charset=utf-8',
+        data: JSON.stringify(param),
+        success: function (response) {
+          alert('수정 완료');
+          closeCommentUpdatePopup();
+          findAllComment();
+        },
+        error: function (error, status, request) {
+          console.log(error)
+        }
+      })
+    }
+
+    // 댓글 수정 팝업 close
+    function closeCommentUpdatePopup() {
+      document.querySelectorAll('#modalContent, #modalWriter').forEach(
+          element => element.value = '');
+      document.getElementById('commentUpdateBtn').removeAttribute('onclick');
+      layerPopClose('commentUpdatePopup');
+    }
+
   </script>
 </th:block>
 </html>
