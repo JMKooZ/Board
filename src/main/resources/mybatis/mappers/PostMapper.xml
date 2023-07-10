@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.study.board.domain.post.PostMapper">
+  <insert id="savePost" parameterType="PostRequest" useGeneratedKeys="true" keyProperty="bno">
+    INSERT INTO board.post (bno, title, content, writer, viewCnt, noticeYn, deleteYn, createdDate,
+                            modifiedDate)
+    VALUES ( #{bno}
+           , #{title}
+           , #{content}
+           , #{writer}
+           , 0
+           , #{noticeYn}
+           , 0
+           , NOW()
+           , NULL)
+  </insert>
+
+  <select id="findByBno" parameterType="Long" resultType="PostResponse">
+    select *
+    from board.post
+    where bno = #{value}
+  </select>
+
+  <update id="update" parameterType="PostRequest">
+    update board.post
+    set modifiedDate = NOW()
+      , title        = #{title}
+      , content      = #{content}
+      , writer       = #{writer}
+      , noticeYn     = #{noticeYn}
+    WHERE bno = #{bno}
+  </update>
+
+  <delete id="deleteByBno" parameterType="Long">
+    UPDATE board.post
+    SET deleteYn = 1
+    WHERE bno = #{bno}
+  </delete>
+
+  <select id="findAll" parameterType="SearchDto" resultType="PostResponse">
+    SELECT *
+    FROM board.post
+    WHERE deleteYn = 0
+    <!-- 검색 키워드가 있을 때 -->
+    <if test="keyword !=null and keyword != ''">
+      <choose>
+        <!-- 검색 유형이 있을때 -->
+        <when test="searchType != null and searchType != ''">
+          <choose>
+            <when test="'title'.equals(searchType)">
+              AND title LIKE CONCAT('%',#{keyword},'%')
+            </when>
+            <when test="'content'.equals(searchType)">
+              AND content LIKE CONCAT('%',#{keyword},'%')
+            </when>
+            <when test="'writer'.equals(searchType)">
+              AND writer LIKE CONCAT('%',#{keyword},'%')
+            </when>
+          </choose>
+        </when>
+        <otherwise>
+          AND (
+          title LIKE CONCAT('%', #{keyword}, '%')
+          OR content LIKE CONCAT('%', #{keyword}, '%')
+          OR writer LIKE CONCAT('%', #{keyword}, '%')
+          )
+        </otherwise>
+      </choose>
+    </if>
+    ORDER BY bno DESC
+    LIMIT #{pagination.limitStart}, #{recordSize}
+  </select>
+
+  <select id="count" parameterType="SearchDto" resultType="int">
+    SELECT COUNT(*)
+    FROM board.post
+    WHERE deleteYn = 0
+  </select>
+</mapper>
