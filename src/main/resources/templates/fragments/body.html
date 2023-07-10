@@ -7,8 +7,8 @@
     <div class="head">
       <h1>게시판 프로젝트</h1>
       <div class="top_menu">
-        <div class="login_user" th:if="${!session.isEmpty()}" th:text="|${session.user.email}님 반갑습니다.|"><strong><i class="far fa-user-circle"></i></strong></div>
-        <div class="login_user" th:unless="${!session.isEmpty()}"><a  th:text="로그인" th:href="@{/user/signUp}" methods="get"></a> </div>
+        <div class="login_user" th:if="${!session.isEmpty()}"><strong><i class="far fa-user-circle"></i> [[ ${session.user.name} ]]</strong>님 반갑습니다.</div>
+        <div class="login_user" th:unless="${!session.isEmpty()}"><a  th:text="로그인" th:href="@{/login.do}" methods="get"></a> </div>
 
         <div class="logout">
           <button type="button" onclick="userLogout()"><span class="skip_info">로그아웃</span><i
@@ -65,7 +65,7 @@
 <script th:inline="javascript">
   function userLogout(){
     $.ajax({
-      url: `/user/logout`,
+      url: `/logout`,
       type: 'post',
       success:function (){
         alert('로그아웃완료')

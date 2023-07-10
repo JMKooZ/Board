@@ -1,39 +1,38 @@
 package com.study.board.domain.user;
 
-import java.util.List;
-import org.apache.catalina.User;
 import org.apache.ibatis.annotations.Mapper;
 
 @Mapper
 public interface UserMapper {
     /**
-     * 사용자 회원가입
-     * @param user -사용자 정보
+     * 회원 정보 저장 (회원가입)
+     * @param params - 회원 정보
      */
-    void saveUser(UserResponse user);
+    void saveUser(UserRequest params);
 
     /**
-     * 사용자 상세정보 조회
-     * @param uno -pk
-     * @return 사용자 상세정보
+     * 회원 상세정보 조회
+     * @param loginId - UK
+     * @return 회원 상세정보
      */
-    UserResponse findByUno(Long uno);
+    UserResponse findById(String loginId);
 
     /**
-     * 사용자 수정
-     * @param user -사용자 정보
+     * 회원 정보 수정
+     * @param params - 회원 정보
      */
-    void updateUser(UserResponse user);
+    void update(UserRequest params);
 
     /**
-     * 사용자 탈퇴
-     * @param uno -pk
+     * 회원 정보 삭제 (회원 탈퇴)
+     * @param uno - PK
      */
-    void deleteUser(Long uno);
+    void deleteByUno(Long uno);
 
     /**
-     * 사용자 상세정보 조회
-     * @return 유저 리스트
+     * 회원 수 카운팅 (ID 중복 체크)
+     * @param loginId - UK
+     * @return 회원 수
      */
-    List<User> findAllUser();
+    int countById(String loginId);
 }

@@ -4,42 +4,51 @@
 
 <mapper namespace="com.study.board.domain.user.UserMapper">
   <insert id="saveUser" parameterType="UserResponse" useGeneratedKeys="true" keyProperty="uno">
-    INSERT INTO board.user (uno, name, email, passWord, nickName, gender, phoneNumber, birth, createdDate, modifiedDate)
-    VALUES ( #{uno}
+    INSERT INTO board.user (loginId, password, name, gender, birthday, deleteYn, createdDate,
+                            modifiedDate)
+    VALUES ( #{loginId}
+           , #{password}
            , #{name}
-           , #{email}
-           , #{passWord}
-           , #{nickName}
            , #{gender}
-           , #{phoneNumber}
-           , #{birth}
+           , #{birthday}
+           , 0
            , NOW()
            , NULL)
   </insert>
 
-  <select id="findByUno" parameterType="Long" resultType="UserResponse">
+  <select id="findById" parameterType="String" resultType="UserResponse">
     select *
     from board.user
-    where
-      # 왜 밸류라고 표시하는지
-      uno = #{uno}
+    where deleteYn = 0
+      and loginId = #{loginId}
   </select>
 
-  <update id="update" parameterType="PostRequest">
-    update board.post
+  <update id="update" parameterType="UserRequest">
+    update board.user
     set modifiedDate = NOW()
-      , title         = #{title}
-      , content       = #{content}
-      , writer        = #{writer}
-      , noticeYn     = #{noticeYn}
-    WHERE bno = #{bno}
+    , name = #{name}
+    , gender = #{gender}
+    , birthday = #{birthday}
+    <if test="password != null and password != ''">
+      , password = #{password}
+    </if>
+    WHERE uno = #{uno}
   </update>
 
-  <delete id="deleteByBno" parameterType="Long">
-    UPDATE board.post
+  <delete id="deleteByUno" parameterType="Long">
+    UPDATE board.user
     SET deleteYn = 1
-    WHERE bno = #{bno}
+    WHERE uno = #{uno}
   </delete>
+
+  <select id="countById" parameterType="String" resultType="int">
+    SELECT
+      COUNT(*)
+    FROM
+      board.user
+    WHERE
+      loginId = #{loginId}
+  </select>
 
   <select id="findAll" resultType="PostResponse">
     SELECT *
