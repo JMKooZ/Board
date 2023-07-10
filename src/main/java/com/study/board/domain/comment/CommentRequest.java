@@ -1,6 +1,7 @@
 package com.study.board.domain.comment;
 
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -13,4 +14,10 @@ public class CommentRequest {
     private Long bno;       // 게시글 번호 (FK)
     private String content;    // 내용
     private String writer;     // 작성자
+    @Builder
+    public CommentRequest(Long bno, String content, String writer) {
+        this.bno = bno;
+        this.content = content;
+        this.writer = writer;
+    }
 }
