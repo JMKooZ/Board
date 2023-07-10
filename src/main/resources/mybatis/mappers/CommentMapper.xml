@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.study.board.domain.comment.CommentMapper">
+
+  <insert id="saveComment" parameterType="CommentRequest" useGeneratedKeys="true" keyProperty="cno">
+    INSERT INTO board.comment(bno, content, writer, deleteYn, createdDate, modifiedDate)
+    VALUES ( #{bno}
+           , #{content}
+           , #{writer}
+           , 0
+           , NOW()
+           , NULL)
+  </insert>
+
+  <select id="findByCno" parameterType="long" resultType="CommentResponse">
+    SELECT *
+    FROM board.comment
+    WHERE cno = #{cno}
+  </select>
+
+  <select id="findAll" parameterType="CommentSearchDto" resultType="CommentResponse">
+    SELECT *
+    FROM board.comment
+    WHERE bno = #{bno}
+      AND deleteYn = 0
+    ORDER BY cno DESC
+    LIMIT #{pagination.limitStart}, #{recordSize}
+  </select>
+
+  <update id="updateComment" parameterType="CommentRequest">
+    UPDATE
+      board.comment
+    SET writer = #{writer},
+        modifiedDate = NOW(),
+        content      = #{content}
+    WHERE cno = #{cno}
+  </update>
+
+  <delete id="deleteByCno" parameterType="long">
+    DELETE
+    FROM board.comment
+    WHERE cno = #{cno}
+  </delete>
+
+  <select id="count" parameterType="CommentSearchDto" resultType="int">
+    select count(*)
+    from board.comment
+    where deleteYn = 0
+      and bno = #{bno};
+  </select>
+
+</mapper>
