@@ -1,15 +1,18 @@
 package com.study.board.controller.post;
 
+import com.study.board.common.file.FileUtils;
 import com.study.board.domain.common.MessageDto;
 import com.study.board.domain.common.SearchDto;
 import com.study.board.domain.common.paging.PagingResponse;
+import com.study.board.domain.file.FileRequest;
+import com.study.board.domain.file.FileResponse;
 import com.study.board.domain.post.PostRequest;
 import com.study.board.domain.post.PostResponse;
+import com.study.board.service.file.FileService;
 import com.study.board.service.post.PostService;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -19,7 +22,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 @RequiredArgsConstructor
@@ -27,6 +29,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 public class PostController {
 
     private final PostService postService;
+    private final FileService fileService;
+    private final FileUtils fileUtils;
     @GetMapping("/")
     public String index(){
         return "redirect:/post/list.do";
@@ -44,6 +48,8 @@ public class PostController {
     @PostMapping("/post/save.do")
     public String savePost(final PostRequest params, Model model){
         postService.savePost(params);
+        List<FileRequest> files = fileUtils.uploadFiles(params.getFiles());
+        fileService.saveFiles(params.getBno(), files);
         MessageDto message = new MessageDto("게시글 생성이 완료되었습니다.", "/post/list.do", RequestMethod.GET,null);
         model.addAttribute("message", message);
         return showMessageAndRedirect(message, model);
@@ -51,6 +57,16 @@ public class PostController {
     @PostMapping("/post/update.do")
     public String updatePost(final PostRequest params, Model model){
         postService.update(params);
+
+        List<FileRequest> uploadFiles = fileUtils.uploadFiles(params.getFiles());
+
+        fileService.saveFiles(params.getBno(), uploadFiles);
+
+        List<FileResponse> deleteFiles = fileService.findAllFileByIds(params.getRemoveFileIds());
+
+        fileUtils.deleteFiles(deleteFiles);
+        fileService.deleteAllFileByIds(params.getRemoveFileIds());
+
         String uri = "/post/view.do?bno="+params.getBno();
         MessageDto message = new MessageDto("게시글 수정이 완료되었습니다.", uri, RequestMethod.GET,null);
         model.addAttribute("message", message);
@@ -86,6 +102,7 @@ public class PostController {
             RequestMethod.GET, queryParamsToMap(queryParams));
         return showMessageAndRedirect(message,model);
     }
+
     // 사용자에게 메시지를 전달하고, 페이지를 리다이렉트 한다.
     private String showMessageAndRedirect(final MessageDto message, Model model) {
         model.addAttribute("message", message);
@@ -100,4 +117,5 @@ public class PostController {
         data.put("searchType", queryParams.getSearchType());
         return data;
     }
+
 }
