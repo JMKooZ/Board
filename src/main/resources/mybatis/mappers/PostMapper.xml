@@ -4,10 +4,10 @@
 
 <mapper namespace="com.study.board.domain.post.PostMapper">
   <insert id="savePost" parameterType="PostRequest" useGeneratedKeys="true" keyProperty="bno">
-    INSERT INTO board.post (bno, title, content, writer, viewCnt, noticeYn, deleteYn, createdDate,
+    INSERT INTO board.post (title, content, writer, viewCnt, noticeYn, deleteYn, createdDate,
                             modifiedDate)
-    VALUES ( #{bno}
-           , #{title}
+    VALUES (
+             #{title}
            , #{content}
            , #{writer}
            , 0
