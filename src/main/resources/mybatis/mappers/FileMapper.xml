@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.study.board.domain.file.FileMapper">
+  <!-- 파일 정보 저장 -->
+  <insert id="saveFiles" parameterType="list">
+    INSERT INTO board.file (
+    bno, originalName, saveName, size, deleteYn, createdDate, deletedDate
+    ) VALUES
+    <foreach item="file" collection="list" separator=",">
+      (
+      #{file.bno}
+      , #{file.originalName}
+      , #{file.saveName}
+      , #{file.size}
+      , 0
+      , NOW()
+      , NULL
+      )
+    </foreach>
+  </insert>
+
+  <select id="findByFno" parameterType="long" resultType="FileResponse">
+    select *
+    from board.file
+    where deleteYn = 0
+      and fno = #{fno}
+  </select>
+
+  <select id="findAllFileByBno" parameterType="long" resultType="FileResponse">
+    SELECT *
+    FROM board.file
+    WHERE deleteYn = 0
+      and bno = #{bno}
+    ORDER BY fno
+  </select>
+
+  <select id="findAllByIds" parameterType="list" resultType="FileResponse">
+    SELECT *
+    FROM board.file
+    WHERE deleteYn = 0
+    and fno IN
+    <foreach item="fno" collection="list" open="(" separator="," close=")">
+      #{fno}
+    </foreach>
+    ORDER BY
+    fno
+  </select>
+
+  <delete id="deleteAllByIds" parameterType="list">
+    UPDATE board.file
+    SET
+    deleteYn = 1
+    ,deletedDate = NOW()
+    WHERE fno IN
+    <foreach item="fno" collection="list" open="(" separator="," close=")">
+      #{fno}
+    </foreach>
+
+  </delete>
+</mapper>
