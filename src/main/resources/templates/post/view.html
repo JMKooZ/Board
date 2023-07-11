@@ -44,6 +44,12 @@
           <th scope="row">내용</th>
           <td colspan="3" th:text="${post.content}"></td>
         </tr>
+        <tr>
+          <th scope="row">첨부파일</th>
+          <td id="files" colspan="3">
+
+          </td>
+        </tr>
         </tbody>
       </table>
 
@@ -115,7 +121,8 @@
   <script th:inline="javascript">
     /*<![CDATA[*/
     window.onload = () => {
-      // 최초 메서드 실행으로 댓글 리스트 가져옴
+      // 최초 메서드 실행으로 댓글,파일 리스트 가져옴
+      findAllFile()
       findAllComment();
     }
 
@@ -127,7 +134,6 @@
     // 게시글 리스트로 돌아가기(뒤로)
     function goListPage() {
       const queryString = new URLSearchParams(location.search);
-      alert(queryString.keys())
       queryString.delete('bno');
       location.href = '/post/list.do' + '?' + queryString.toString();
     }
@@ -334,6 +340,31 @@
       document.getElementById('commentUpdateBtn').removeAttribute('onclick');
       layerPopClose('commentUpdatePopup');
     }
+
+    // 파일 리스트 보여주기
+    function findAllFile(){
+      // 1. API 호출
+      const bno = [[${post.bno}]];
+      const response = getJson(`/posts/${bno}/files`);
+      console.log(response)
+      console.log(response.length)
+      // 2. 로직 종료
+      if (!response.length){
+        return false;
+      }
+
+      // 3. 파일 영역 추가
+      let fileHtml = '<div class="file_down"><div class="cont">';
+      response.forEach(file =>{
+        fileHtml += `<a href="/posts/${bno}/files/${file.fno}/download"><span class="icons"><i class="fas fa-folder-open"></i></span>
+        ${file.originalName}</a>`
+      })
+
+      fileHtml += '</div></div>';
+
+      // 4. 파일 HTML 렌더링
+      document.getElementById('files').innerHTML = fileHtml;
+      }
 
   </script>
 </th:block>
